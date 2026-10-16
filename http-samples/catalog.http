@@ -1,0 +1,96 @@
+### Product Catalog REST API - runnable requests
+### IntelliJ IDEA HTTP Client or VS Code "REST Client": click "Send Request" above each block.
+@base = http://localhost:8080
+@api = {{base}}/api/v1/products
+
+### List (JSON, default)
+GET {{api}}?size=5
+
+### Same list as plain text / XML / HTML (content negotiation)
+GET {{api}}?size=5
+Accept: text/plain
+
+###
+GET {{api}}?size=5
+Accept: application/xml
+
+###
+GET {{api}}?size=5&format=html
+
+### Search: Electronics 1000-9000, in stock, most expensive first, 3 per page (see Link header)
+GET {{api}}?category=electronics&minPrice=1000&maxPrice=9000&inStock=true&sort=price,desc&size=3&page=0
+
+### Keyword search
+GET {{api}}?q=bottle&sort=name
+
+### Create (JSON) -> 201 + Location + ETag
+POST {{api}}
+Content-Type: application/json
+
+{
+  "sku": "FIT-KBEL-01",
+  "name": "Kettlebell 8 kg",
+  "description": "Cast iron kettlebell",
+  "category": "Fitness",
+  "price": 1899.00,
+  "stock": 25
+}
+
+### Create (XML)
+POST {{api}}
+Content-Type: application/xml
+Accept: application/xml
+
+<product>
+  <sku>FIT-KBEL-02</sku>
+  <name>Kettlebell 12 kg</name>
+  <category>Fitness</category>
+  <price>2499.00</price>
+  <stock>10</stock>
+</product>
+
+### Read one (copy the ETag from the response for the next requests)
+GET {{api}}/1
+
+### Conditional GET -> 304 when unchanged (paste the ETag)
+GET {{api}}/1
+If-None-Match: "paste-etag-here"
+
+### Replace (PUT)
+PUT {{api}}/1
+Content-Type: application/json
+
+{
+  "sku": "ELEC-MOUSE-01",
+  "name": "Wireless Mouse (Silent)",
+  "category": "Electronics",
+  "price": 899.00,
+  "stock": 100
+}
+
+### Partial update (PATCH, merge patch) with optimistic locking
+PATCH {{api}}/1
+Content-Type: application/merge-patch+json
+If-Match: "paste-etag-here"
+
+{ "stock": 80 }
+
+### Delete -> 204
+DELETE {{api}}/2
+
+### Errors: validation (400), unknown id (404), bad Accept (406)
+POST {{api}}
+Content-Type: application/json
+
+{ "sku": "x", "name": "", "price": -1, "stock": -5 }
+
+###
+GET {{api}}/99999
+Accept: application/xml
+
+###
+GET {{api}}
+Accept: image/png
+
+### OpenAPI document
+GET {{base}}/openapi.json

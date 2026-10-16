@@ -1,0 +1,9 @@
+{
+  "version": "1",
+  "name": "Product Catalog REST",
+  "type": "collection",
+  "ignore": [
+    "node_modules",
+    ".git"
+  ]
+}
